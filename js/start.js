@@ -8,6 +8,7 @@ window.renderStatistics = function (ctx, names, times) {
   ctx.strokeRect(100, 10, 420, 270);
   ctx.fillRect(100, 10, 420, 270);
 
+
   ctx.fillStyle = '#000';
   ctx.font = '16px PT Mono';
   
@@ -16,32 +17,39 @@ window.renderStatistics = function (ctx, names, times) {
 
   var max = -1;
   var maxIndex = -1;
+
+  for(var i = 0; i < times.length; i++) {
+    var time = times[i];
+    if (time > max) {
+      max = time;
+      maxIndex = i;
+    }
+  }
+
   
-    for(var i = 0; i < times.length; i++) {
-      var time = times[i];
-      if (time > max) {
-        max = time;
-        maxIndex = i;
-      }
+
+  var histogramHeight = 150;
+  var step = histogramHeight / (max - 0);
+
+  
+  for (var i = 0; i < times.length; i++) {
+    var barWidth = 40; // px; 
+    var indent = 70;    // px;
+    var initialX = 120; // px;
+    var initialY = 80;  // px;
+    var lineHeight = 15;// px;
+
+    ctx.fillRect(initialX + indent * i, (histogramHeight - (times[i] * step)) + 80, barWidth, times[i] * step);
+ 
+    if (times[i] = names.indexOf('Вы')) {
+      ctx.fillStyle = 'red';
+      ctx.fillText(names[i], initialX + indent * i, initialY + histogramHeight + barWidth);
+    } else {
+      ctx.fillStyle = 'rgba(255, 0, 0, 1)';
     }
 
-    var histogramWidth = 150;
-    var step = histogramWidth / (max - 0);
-
-    for(var i = 0; i < times.length; i++) {
-        
-            ctx.fillRect(120, 80 + 50 * i, times[i] * step, 40);
-            ctx.fillText(names[i], 120 + histogramWidth + 20, 80 + 15 + 40 * i);
-          }
-
-
-    // ctx.translate(180, 390);
-    // ctx.rotate(-90 * Math.PI / 180);
-    // ctx.fillRect(120, 80, times[0] * step, 20);
-    // ctx.fillText(names[0], 120 + histogramWidth + 20, 80 + 15 + 40 * i);
-    // ctx.fillRect(120, 110, times[1] * step, 20);
-    // ctx.fillRect(120, 140, times[2] * step, 20);
-    // ctx.fillRect(120, 170, times[3] * step, 20);
+    ctx.fillText(names[i], initialX + indent * i, initialY + histogramHeight + barWidth);
+  }
 };
 
 
