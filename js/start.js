@@ -1,17 +1,28 @@
 'use strict';
 
+
+var getRandomColor = function () {
+  var opacity = Math.random().toFixed(2);
+
+  return 'rgba(0, 0, 255, ' + opacity + ')';
+};
+
+var getColor = function (condition) {
+  return condition ? 'rgba(255, 0, 0, 1)' : getRandomColor();
+};
+
 var getMaxElement = function (times) {
   var max = -1;
   var maxIndex = -1;
 
   for (var i = 0; i < times.length; i++) {
-    var time = times[i];
-    if (time > max) {
-      max = time;
+    if (times[i] > max) {
+      max = times[i];
       maxIndex = i;
     }
   }
-  return max;
+
+  return times[maxIndex];
 };
 
 window.renderStatistics = function (ctx, names, times) {
@@ -30,30 +41,16 @@ window.renderStatistics = function (ctx, names, times) {
 
   var histogramHeight = 150;
   var step = histogramHeight / (getMaxElement(times) - 0);
-
-  var getColor = function (element) {
-    if (element === names.indexOf('Вы')) {
-      ctx.fillStyle = 'red';
-    } else {
-      ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-    }
-  };
+  var barWidth = 40;
+  var indent = 50;
+  var initialX = 120;
+  var initialY = 80;
+  var lineHeight = 15;
 
   for (var i = 0; i < times.length; i++) {
-    var barWidth = 40;
-    var indent = 70;
-    var initialX = 120;
-    var initialY = 80;
-    var lineHeight = 15;
-
-    ctx.fillText(Math.floor(times[i]), initialX + indent * i, initialY);
-    ctx.fillText(names[i], initialX + indent * i, initialY + histogramHeight + barWidth);
-
-    getColor(i);
-
-    ctx.fillRect(initialX + indent * i, (histogramHeight - (times[i] * step)) + 80 + lineHeight, barWidth, times[i] * step);
+    ctx.fillStyle = getColor(names[i] === 'Вы');
+    ctx.fillText(Math.floor(times[i]), initialX + (indent + barWidth) * i, initialY);
+    ctx.fillText(names[i], initialX + (indent + barWidth) * i, initialY + histogramHeight + barWidth);
+    ctx.fillRect(initialX + (indent + barWidth) * i, (histogramHeight - (times[i] * step)) + 80 + lineHeight, barWidth, times[i] * step);
   }
 };
-
-
-window.renderStatistics(ctx, names, times);
