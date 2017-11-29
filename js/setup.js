@@ -31,6 +31,7 @@ var createWizards = function () {
   return wizards;
 };
 
+
 var render = function () {
   var wizardElement = similarWizardTemplate.cloneNode(true);
 
