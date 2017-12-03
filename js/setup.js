@@ -1,12 +1,13 @@
 'use strict';
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 var WIZARD_NAMES = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
-
 var WIZARD_SURNAMES = ['да Марья', 'Верон', 'Мирабелла', 'Вальц', 'Онопко', 'Топольницкая', 'Нионго', 'Ирвинг'];
 
 var COAT_COLORS = ['rgb(101, 137, 164)', 'rgb(241, 43, 107)', 'rgb(146, 100, 161)', 'rgb(56, 159, 117)', 'rgb(215, 210, 55)', 'rgb(0, 0, 0)'];
-
 var EYE_COLORS = ['black', 'red', 'blue', 'yellow', 'green'];
+var FIREBALL_COLORS = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848']
 
 var userDialog = document.querySelector('.setup');
 var similarListElement = document.querySelector('.setup-similar-list');
@@ -14,7 +15,8 @@ var similarWizardTemplate = document.querySelector('#similar-wizard-template').c
 var setup = document.querySelector('.setup');
 var setupOpen = document.querySelector('.setup-open');
 var setupClose = setup.querySelector('.setup-close');
-var nameHolder = setup.querySelector('.setup-user-name');
+var setupUserName = setup.querySelector('.setup-user-name');
+var setupWizardForm = setup.querySelector('.setup-wizard-form');
 var submitButton = setup.querySelector('.setup-submit');
 var wizardCoat = document.querySelector('.setup-wizard .wizard-coat');
 var wizardEye = document.querySelector('.setup-wizard .wizard-eyes');
@@ -22,94 +24,72 @@ var wizardFireball = document.querySelector('.setup-fireball-wrap');
 
 document.querySelector('.setup-similar').classList.remove('hidden');
 
-////добавление листенеров на открытие-закрытие/////
-
-var onPopupEntrPress = function (evt) {
-  if (evt.keyCode === 13) {
-    openPopup();
-  }
-};
-
-var submitForm = function (evt) {
-  if (evt.keyCode === 13) {
-    closePopup();
-    return;
-  }
-};
-
-var openPopup = function (evt) {
-  setup.classList.remove('hidden');
-  document.addEventListener('keydown', onPopupEscPress);
-  setupOpen.removeEventListener('keydown', onPopupEntrPress);
-  submitButton.addEventListener('keydown', submitForm);
-};
-
-var closePopup = function (evt) {
-  if (nameHolder.focused) {
-    return;
-  } else {
-    setup.classList.add('hidden');
-    document.removeEventListener('keydown', onPopupEscPress);
-    submitButton.removeEventListener('keydown', submitForm);
-    setupOpen.addEventListener('keydown', onPopupEntrPress);
-  }
-};
-
-
-var onPopupEscPress = function (evt) {
-  if (evt.keyCode === 27) {
-    closePopup();
-  }
-};
-
 setupOpen.addEventListener('click', function () {
   openPopup();
+});
+
+setupOpen.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openPopup();
+  }
 });
 
 setupClose.addEventListener('click', function () {
   closePopup();
 });
 
+setupClose.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+});
 
-////добавление листенеров на цвет/////
+submitButton.addEventListener('click', submitForm);
+submitButton.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    submitForm();
+  }
+});
 
-var changeCoatColor = function () {
-  wizardCoat.style.fill = COAT_COLORS[getRandomInteger(0, 5)];
-  wizardCoat.style.cursor = 'pointer';
+var openPopup = function (evt) {
+  setup.classList.remove('hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var closePopup = function (evt) {
+  setup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+var onPopupEscPress = function (evt) {
+  if (document.activeElement !== setupUserName && evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var submitForm = function () {
+  if (setupUserName.checkValidity()) {
+    setupWizardForm.submit();
+  }
 };
 
 wizardCoat.addEventListener('click', function () {
-  changeCoatColor();
+  wizardCoat.style.fill = COAT_COLORS[getRandomInteger(0, COAT_COLORS.length)];
 });
-
-var changeEyeColor = function () {
-  wizardEye.style.fill = EYE_COLORS[getRandomInteger(0, 4)];
-  wizardEye.style.cursor = 'pointer';
-};
-
 
 wizardEye.addEventListener('click', function () {
-  changeEyeColor();
+  wizardEye.style.fill = EYE_COLORS[getRandomInteger(0, EYE_COLORS.length)];
 });
-
 
 wizardFireball.addEventListener('click', function () {
-  changeFireColor();
+  wizardFireball.style.background = FIREBALL_COLORS[getRandomInteger(0, FIREBALL_COLORS.length)];
 });
-
-
-var changeFireColor = function () {
-  wizardFireball.style.fill = COAT_COLORS[getRandomInteger(0, 5)];
-  wizardFireball.style.cursor = 'pointer';
-};
-
-////добавление листенеров на создание персонажа/////
 
 var getRandomInteger = function (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-var getWizards = function (wizardsCount) {
+var createWizards = function (wizardsCount) {
   var wizards = [];
 
   for (var i = 0; i < wizardsCount; i++) {
@@ -122,7 +102,7 @@ var getWizards = function (wizardsCount) {
   return wizards;
 };
 
-var wizard = getWizards(4);
+var wizard = createWizards(4);
 
 var getWizardElement = function (element) {
   var wizardElement = similarWizardTemplate.cloneNode(true);
